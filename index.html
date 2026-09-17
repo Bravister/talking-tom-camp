@@ -208,5 +208,24 @@
 
     <script src="config.js"></script>
     <script src="app.js"></script>
+
+    <script>
+        // Emergency navigation fallback:
+        // If the external game JavaScript fails to initialize, the first button
+        // can still move the player to the quiz screen.
+        document.addEventListener("DOMContentLoaded", function () {
+            const start = document.getElementById("btn-start-mission");
+            if (start) {
+                start.addEventListener("click", function () {
+                    document.querySelectorAll(".screen").forEach(function (s) {
+                        s.classList.remove("active");
+                    });
+                    const quiz = document.getElementById("screen-quiz");
+                    if (quiz) quiz.classList.add("active");
+                });
+            }
+        });
+    </script>
+
 </body>
 </html>

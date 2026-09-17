@@ -15,14 +15,28 @@ class MiniGameApp {
     }
 
     init() {
-        // Populate configuration
-        this.setupConfig();
-        
-        // Bind events
-        this.bindEvents();
-        
-        // Show initial screen
+        // Show the welcome screen immediately.
         this.showScreen(1);
+
+        // Optional setup should never prevent the main button from working.
+        try {
+            this.setupConfig();
+        } catch (error) {
+            console.error("Configuration setup failed:", error);
+        }
+
+        // Bind events independently.
+        try {
+            this.bindEvents();
+        } catch (error) {
+            console.error("Some game events failed to bind:", error);
+        }
+
+        // Critical fallback: always wire Start Mission directly.
+        const startButton = document.getElementById("btn-start-mission");
+        if (startButton) {
+            startButton.onclick = () => this.goToScreen(2);
+        }
     }
 
     setupConfig() {
@@ -40,7 +54,10 @@ class MiniGameApp {
 
     bindEvents() {
         // Screen 1: Start mission
-        document.getElementById('btn-start-mission').addEventListener('click', () => this.goToScreen(2));
+        const startButton = document.getElementById('btn-start-mission');
+        if (startButton) {
+            startButton.addEventListener('click', () => this.goToScreen(2));
+        }
 
         // Screen 2: Quiz
         this.setupQuizScreen();
@@ -74,13 +91,16 @@ class MiniGameApp {
         });
 
         // Moon tap for easter egg
-        document.querySelector('.moon').addEventListener('click', () => {
-            moonTapCount++;
-            if (moonTapCount >= MOON_TAPS_FOR_EGG && !this.easterEggFound) {
-                this.easterEggFound = true;
-                this.showEasterEgg();
-            }
-        });
+        const moon = document.querySelector('.moon');
+        if (moon) {
+            moon.addEventListener('click', () => {
+                moonTapCount++;
+                if (moonTapCount >= MOON_TAPS_FOR_EGG && !this.easterEggFound) {
+                    this.easterEggFound = true;
+                    this.showEasterEgg();
+                }
+            });
+        }
     }
 
     showScreen(screenNumber) {
@@ -88,7 +108,6 @@ class MiniGameApp {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
         // Show selected screen
-        const screen = document.getElementById(`screen-arrival`);
         if (screenNumber === 1) document.getElementById('screen-arrival').classList.add('active');
         else if (screenNumber === 2) {
             document.getElementById('screen-quiz').classList.add('active');
