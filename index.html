@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1a1f35">
+    <title>The Lost Memory</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="app">
+        <!-- SCREEN 1: Welcome -->
+        <div id="screen-arrival" class="screen active">
+            <div class="arrival-container">
+                <div class="stars-bg"></div>
+                <div class="campsite-silhouette">
+                    <div class="tent"></div>
+                    <div class="cabin"></div>
+                    <div class="tree"></div>
+                </div>
+                
+                <div class="arrival-content">
+                    <h1 class="welcome-title">Welcome back, <span id="friend-name-display">Yuki</span> 🇯🇵✨</h1>
+                    <p class="welcome-subtitle">Your study break has officially ended...</p>
+                    <p class="welcome-text">But before you disappear into your books again,<br>you have one tiny mission. 🎮</p>
+                    
+                    <button class="btn-primary" id="btn-start-mission">START MISSION →</button>
+                </div>
+                
+                <div class="floating-particles"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: Friendship Checkpoint Quiz -->
+        <div id="screen-quiz" class="screen">
+            <div class="quiz-container">
+                <div class="quiz-header">
+                    <h2>FRIENDSHIP CHECKPOINT 🎮</h2>
+                    <p>Let's see if you remember how this friendship started...</p>
+                    <div class="quiz-progress">
+                        <span id="quiz-counter">1</span> / <span id="quiz-total">5</span>
+                    </div>
+                </div>
+
+                <div class="quiz-content">
+                    <div class="question-box" id="question-container">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <div class="quiz-feedback" id="quiz-feedback" style="display: none;">
+                        <!-- Feedback shown here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: The Little Camp -->
+        <div id="screen-camp" class="screen">
+            <div class="camp-container">
+                <div class="camp-header">
+                    <h2>THE LITTLE CAMP 🏕️</h2>
+                    <p>Something is waiting for you here...</p>
+                </div>
+
+                <div class="camp-scene">
+                    <div class="sky-layer">
+                        <div class="stars"></div>
+                        <div class="moon"></div>
+                    </div>
+
+                    <div class="ground-layer">
+                        <!-- Interactive Objects -->
+                        <div class="camp-object campfire" data-object="campfire" title="Tap to read">
+                            <div class="fire"></div>
+                            <div class="campfire-logs"></div>
+                        </div>
+
+                        <div class="camp-object console" data-object="console" title="Tap to read">
+                            <div class="controller"></div>
+                        </div>
+
+                        <div class="camp-object tent" data-object="tent" title="Tap to read">
+                            <div class="tent-shape"></div>
+                        </div>
+
+                        <div class="camp-object cabin" data-object="cabin" title="Tap to read">
+                            <div class="cabin-shape"></div>
+                        </div>
+
+                        <div class="camp-object mailbox" data-object="mailbox" title="Tap to read">
+                            <div class="mailbox-shape"></div>
+                        </div>
+
+                        <div class="camp-object mystery-chest" data-object="mystery-chest" title="Tap to interact">
+                            <div class="chest-shape"></div>
+                            <div class="chest-lock"></div>
+                        </div>
+
+                        <div class="camp-object tree" data-object="tree" title="Tap to read">
+                            <div class="tree-trunk"></div>
+                            <div class="tree-foliage"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="coins-counter">
+                    FRIENDSHIP COINS: <span id="coins-collected">0</span>/5
+                </div>
+
+                <div class="camp-popup" id="camp-popup" style="display: none;">
+                    <button class="popup-close" id="popup-close">✕</button>
+                    <div class="popup-content" id="popup-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: The Memory Chest / Certificate -->
+        <div id="screen-certificate" class="screen">
+            <div class="certificate-container">
+                <div class="certificate-bg">
+                    <h2 class="cert-title">MISSION COMPLETE! 🎉</h2>
+                    <p class="cert-subtitle">You found the lost memory.</p>
+
+                    <div class="friendship-certificate">
+                        <div class="cert-header">OFFICIAL FRIENDSHIP CERTIFICATE</div>
+                        
+                        <div class="cert-content">
+                            <p class="cert-line">This certifies that:</p>
+                            
+                            <p class="cert-name" id="cert-friend-name">Yuki</p>
+                            
+                            <p class="cert-line">has successfully renewed her friendship with:</p>
+                            
+                            <p class="cert-name" id="cert-my-name">Dev</p>
+                            
+                            <div class="cert-divider"></div>
+                            
+                            <div class="cert-status">
+                                <p><strong>Status:</strong></p>
+                                <p class="status-value">BEST FRIEND ENERGY 🫡</p>
+                            </div>
+                            
+                            <div class="cert-achievement">
+                                <p><strong>Achievement:</strong></p>
+                                <p class="achievement-value">"Met through Brawl Stars and somehow still talking."</p>
+                            </div>
+                            
+                            <div class="cert-terms">
+                                <p><strong>Validity:</strong> UNLIMITED</p>
+                                <p><strong>Returns:</strong> NOT ACCEPTED</p>
+                                <p><strong>Exchanges:</strong> NOT AVAILABLE</p>
+                                <p><strong>Complaints:</strong> Ignored 😂</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: Final Message -->
+        <div id="screen-final" class="screen">
+            <div class="final-container">
+                <div class="final-content">
+                    <h2 class="final-heading">ONE LAST THING...</h2>
+                    
+                    <div class="final-message">
+                        <p class="welcome-back">Welcome back. ❤️</p>
+                        
+                        <p id="final-message-text">
+                            I hope your studies are going well.
+                            <br><br>
+                            Don't let this tiny website distract you for too long.
+                            <br><br>
+                            Go be brilliant. 📚✨
+                            <br><br>
+                            I'll be here when you come back.
+                        </p>
+                        
+                        <p class="final-ps">
+                            <strong>P.S.</strong><br>
+                            You now officially owe me one game of Brawl Stars.
+                        </p>
+                    </div>
+                    
+                    <div class="final-buttons">
+                        <button class="btn-primary" id="btn-play-again">PLAY AGAIN 🎮</button>
+                        <button class="btn-secondary" id="btn-close-mission">Close Mission ✕</button>
+                    </div>
+                </div>
+
+                <div class="floating-particles final-particles"></div>
+            </div>
+        </div>
+
+        <!-- Easter Egg Popup -->
+        <div id="easter-egg-popup" class="screen overlay" style="display: none;">
+            <div class="easter-egg-content">
+                <p>YOU FOUND THE SECRET 👀</p>
+                <div class="egg-message">
+                    <p>Okay, you officially explored everything.</p>
+                    <p>Now seriously...</p>
+                    <p>GO STUDY. 😂📚</p>
+                </div>
+                <button class="btn-primary" id="btn-close-egg">Got it ✓</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
