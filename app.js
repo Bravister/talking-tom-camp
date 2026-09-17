@@ -20,7 +20,16 @@ class MiniGameApp {
 
         // Optional setup should never prevent the main button from working.
         try {
-            this.setupConfig();
+            if (typeof CONFIG !== 'undefined' && CONFIG.campObjects.mailbox) {
+                CONFIG.campObjects.mailbox.message = CONFIG.friendshipMessage;
+            }
+            
+            if (typeof CONFIG !== 'undefined') {
+                document.getElementById('friend-name-display').textContent = CONFIG.friendName;
+                document.getElementById('cert-friend-name').textContent = CONFIG.friendName;
+                document.getElementById('cert-my-name').textContent = CONFIG.myName;
+                document.getElementById('final-message-text').textContent = CONFIG.finalMessage;
+            }
         } catch (error) {
             console.error("Configuration setup failed:", error);
         }
@@ -35,21 +44,10 @@ class MiniGameApp {
         // Critical fallback: always wire Start Mission directly.
         const startButton = document.getElementById("btn-start-mission");
         if (startButton) {
-            startButton.onclick = () => this.goToScreen(2);
+            startButton.onclick = () => {
+                this.goToScreen(2);
+            };
         }
-    }
-
-    setupConfig() {
-        // Set the mailbox message from config
-        if (CONFIG.campObjects.mailbox) {
-            CONFIG.campObjects.mailbox.message = CONFIG.friendshipMessage;
-        }
-
-        // Display friend's name
-        document.getElementById('friend-name-display').textContent = CONFIG.friendName;
-        document.getElementById('cert-friend-name').textContent = CONFIG.friendName;
-        document.getElementById('cert-my-name').textContent = CONFIG.myName;
-        document.getElementById('final-message-text').textContent = CONFIG.finalMessage;
     }
 
     bindEvents() {
@@ -66,13 +64,19 @@ class MiniGameApp {
         this.setupCampScreen();
 
         // Screen 5: Final buttons
-        document.getElementById('btn-play-again').addEventListener('click', () => this.resetAndStart());
-        document.getElementById('btn-close-mission').addEventListener('click', () => this.showFinalClosure());
+        if (document.getElementById('btn-play-again')) {
+            document.getElementById('btn-play-again').addEventListener('click', () => this.resetAndStart());
+        }
+        if (document.getElementById('btn-close-mission')) {
+            document.getElementById('btn-close-mission').addEventListener('click', () => this.showFinalClosure());
+        }
 
         // Easter egg close
-        document.getElementById('btn-close-egg').addEventListener('click', () => {
-            document.getElementById('easter-egg-popup').style.display = 'none';
-        });
+        if (document.getElementById('btn-close-egg')) {
+            document.getElementById('btn-close-egg').addEventListener('click', () => {
+                document.getElementById('easter-egg-popup').style.display = 'none';
+            });
+        }
     }
 
     setupQuizScreen() {
@@ -81,9 +85,12 @@ class MiniGameApp {
 
     setupCampScreen() {
         // Close popup button
-        document.getElementById('popup-close').addEventListener('click', () => {
-            this.closeCampPopup();
-        });
+        const popupClose = document.getElementById('popup-close');
+        if (popupClose) {
+            popupClose.addEventListener('click', () => {
+                this.closeCampPopup();
+            });
+        }
 
         // Camp objects
         document.querySelectorAll('.camp-object').forEach(obj => {
@@ -94,10 +101,12 @@ class MiniGameApp {
         const moon = document.querySelector('.moon');
         if (moon) {
             moon.addEventListener('click', () => {
-                moonTapCount++;
-                if (moonTapCount >= MOON_TAPS_FOR_EGG && !this.easterEggFound) {
-                    this.easterEggFound = true;
-                    this.showEasterEgg();
+                if (typeof moonTapCount !== 'undefined') {
+                    moonTapCount++;
+                    if (moonTapCount >= MOON_TAPS_FOR_EGG && !this.easterEggFound) {
+                        this.easterEggFound = true;
+                        this.showEasterEgg();
+                    }
                 }
             });
         }
@@ -108,14 +117,27 @@ class MiniGameApp {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
         // Show selected screen
-        if (screenNumber === 1) document.getElementById('screen-arrival').classList.add('active');
+        if (screenNumber === 1) {
+            const s1 = document.getElementById('screen-arrival');
+            if (s1) s1.classList.add('active');
+        }
         else if (screenNumber === 2) {
-            document.getElementById('screen-quiz').classList.add('active');
+            const s2 = document.getElementById('screen-quiz');
+            if (s2) s2.classList.add('active');
             this.showQuizQuestion();
         }
-        else if (screenNumber === 3) document.getElementById('screen-camp').classList.add('active');
-        else if (screenNumber === 4) document.getElementById('screen-certificate').classList.add('active');
-        else if (screenNumber === 5) document.getElementById('screen-final').classList.add('active');
+        else if (screenNumber === 3) {
+            const s3 = document.getElementById('screen-camp');
+            if (s3) s3.classList.add('active');
+        }
+        else if (screenNumber === 4) {
+            const s4 = document.getElementById('screen-certificate');
+            if (s4) s4.classList.add('active');
+        }
+        else if (screenNumber === 5) {
+            const s5 = document.getElementById('screen-final');
+            if (s5) s5.classList.add('active');
+        }
 
         this.currentScreen = screenNumber;
         
@@ -132,67 +154,86 @@ class MiniGameApp {
     // ========================================================================
 
     showQuizQuestion() {
-        const question = CONFIG.quizQuestions[this.currentQuestion];
-        const container = document.getElementById('question-container');
-        const feedback = document.getElementById('quiz-feedback');
-        const counter = document.getElementById('quiz-counter');
-        const total = document.getElementById('quiz-total');
+        try {
+            if (typeof CONFIG === 'undefined' || !CONFIG.quizQuestions) {
+                console.error("CONFIG not loaded yet");
+                return;
+            }
 
-        counter.textContent = this.currentQuestion + 1;
-        total.textContent = CONFIG.quizQuestions.length;
+            const question = CONFIG.quizQuestions[this.currentQuestion];
+            const container = document.getElementById('question-container');
+            const feedback = document.getElementById('quiz-feedback');
+            const counter = document.getElementById('quiz-counter');
+            const total = document.getElementById('quiz-total');
 
-        feedback.style.display = 'none';
+            if (!container) return;
 
-        container.innerHTML = `
-            <h3>${question.question}</h3>
-            <div class="options-grid">
-                ${question.options.map((option, index) => `
-                    <button class="option" data-index="${index}">
-                        ${String.fromCharCode(65 + index)}. ${option}
-                    </button>
-                `).join('')}
-            </div>
-        `;
+            if (counter) counter.textContent = this.currentQuestion + 1;
+            if (total) total.textContent = CONFIG.quizQuestions.length;
 
-        container.querySelectorAll('.option').forEach(btn => {
-            btn.addEventListener('click', (e) => this.answerQuestion(e.target.closest('.option')));
-        });
+            if (feedback) feedback.style.display = 'none';
+
+            container.innerHTML = `
+                <h3>${question.question}</h3>
+                <div class="options-grid">
+                    ${question.options.map((option, index) => `
+                        <button class="option" data-index="${index}">
+                            ${String.fromCharCode(65 + index)}. ${option}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+
+            container.querySelectorAll('.option').forEach(btn => {
+                btn.addEventListener('click', (e) => this.answerQuestion(e.target.closest('.option')));
+            });
+        } catch (error) {
+            console.error("Error showing quiz question:", error);
+        }
     }
 
     answerQuestion(optionBtn) {
-        const question = CONFIG.quizQuestions[this.currentQuestion];
-        const selectedIndex = parseInt(optionBtn.dataset.index);
-        const isCorrect = selectedIndex === question.correct;
+        try {
+            if (typeof CONFIG === 'undefined') return;
+            
+            const question = CONFIG.quizQuestions[this.currentQuestion];
+            const selectedIndex = parseInt(optionBtn.dataset.index);
+            const isCorrect = selectedIndex === question.correct;
 
-        // Disable all options
-        document.querySelectorAll('.option').forEach(btn => btn.classList.add('disabled'));
+            // Disable all options
+            document.querySelectorAll('.option').forEach(btn => btn.classList.add('disabled'));
 
-        // Show result
-        if (isCorrect) {
-            optionBtn.classList.add('correct');
-            this.coinsCollected++;
-            this.questionsAnswered++;
-        } else {
-            optionBtn.classList.add('incorrect');
-            document.querySelectorAll('.option')[question.correct].classList.add('correct');
-            this.questionsAnswered++;
-        }
-
-        // Show feedback
-        const feedback = document.getElementById('quiz-feedback');
-        feedback.textContent = isCorrect ? question.feedback : `Not quite. The correct answer is ${String.fromCharCode(65 + question.correct)}.`;
-        feedback.style.display = 'block';
-
-        // Next question or proceed
-        setTimeout(() => {
-            if (this.currentQuestion < CONFIG.quizQuestions.length - 1) {
-                this.currentQuestion++;
-                this.showQuizQuestion();
+            // Show result
+            if (isCorrect) {
+                optionBtn.classList.add('correct');
+                this.coinsCollected++;
+                this.questionsAnswered++;
             } else {
-                // Move to camp
-                setTimeout(() => this.goToScreen(3), 500);
+                optionBtn.classList.add('incorrect');
+                document.querySelectorAll('.option')[question.correct].classList.add('correct');
+                this.questionsAnswered++;
             }
-        }, 2000);
+
+            // Show feedback
+            const feedback = document.getElementById('quiz-feedback');
+            if (feedback) {
+                feedback.textContent = isCorrect ? question.feedback : `Not quite. The correct answer is ${String.fromCharCode(65 + question.correct)}.`;
+                feedback.style.display = 'block';
+            }
+
+            // Next question or proceed
+            setTimeout(() => {
+                if (this.currentQuestion < CONFIG.quizQuestions.length - 1) {
+                    this.currentQuestion++;
+                    this.showQuizQuestion();
+                } else {
+                    // Move to camp
+                    setTimeout(() => this.goToScreen(3), 500);
+                }
+            }, 2000);
+        } catch (error) {
+            console.error("Error answering question:", error);
+        }
     }
 
     // ========================================================================
@@ -200,64 +241,81 @@ class MiniGameApp {
     // ========================================================================
 
     campObjectClicked(objElement) {
-        const objectType = objElement.dataset.object;
-        
-        if (objectType === 'mystery-chest') {
-            if (this.coinsCollected >= 5) {
-                this.openChest();
-            } else {
-                this.showCampPopup(
-                    'Locked 🔒',
-                    `Requires ${5 - this.coinsCollected} more friendship coin(s).\n\nTap the other objects to collect coins.`
-                );
+        try {
+            const objectType = objElement.dataset.object;
+            
+            if (objectType === 'mystery-chest') {
+                if (this.coinsCollected >= 5) {
+                    this.openChest();
+                } else {
+                    this.showCampPopup(
+                        'Locked 🔒',
+                        `Requires ${5 - this.coinsCollected} more friendship coin(s).\n\nTap the other objects to collect coins.`
+                    );
+                }
+                return;
             }
-            return;
-        }
 
-        // Regular object
-        if (objectType in CONFIG.campObjects) {
-            const objData = CONFIG.campObjects[objectType];
-            if (objData.message) {
-                this.showCampPopup(objData.title, objData.message);
-                
-                // Award coin if not already collected
-                if (!this.campObjectsViewed.has(objectType)) {
-                    this.campObjectsViewed.add(objectType);
-                    this.coinsCollected++;
-                    this.updateCoinsDisplay();
-                    this.showCoinCollected();
+            // Regular object
+            if (typeof CONFIG !== 'undefined' && objectType in CONFIG.campObjects) {
+                const objData = CONFIG.campObjects[objectType];
+                if (objData.message) {
+                    this.showCampPopup(objData.title, objData.message);
+                    
+                    // Award coin if not already collected
+                    if (!this.campObjectsViewed.has(objectType)) {
+                        this.campObjectsViewed.add(objectType);
+                        this.coinsCollected++;
+                        this.updateCoinsDisplay();
+                        this.showCoinCollected();
+                    }
                 }
             }
+        } catch (error) {
+            console.error("Error clicking camp object:", error);
         }
     }
 
     showCampPopup(title, message) {
-        const popup = document.getElementById('camp-popup');
-        const content = document.getElementById('popup-content');
-        
-        content.innerHTML = `
-            <div class="popup-title">${title}</div>
-            <div class="popup-message">${message}</div>
-        `;
-        
-        popup.style.display = 'flex';
+        try {
+            const popup = document.getElementById('camp-popup');
+            const content = document.getElementById('popup-content');
+            
+            if (!popup || !content) return;
+            
+            content.innerHTML = `
+                <div class="popup-title">${title}</div>
+                <div class="popup-message">${message}</div>
+            `;
+            
+            popup.style.display = 'flex';
+        } catch (error) {
+            console.error("Error showing popup:", error);
+        }
     }
 
     closeCampPopup() {
-        document.getElementById('camp-popup').style.display = 'none';
+        const popup = document.getElementById('camp-popup');
+        if (popup) popup.style.display = 'none';
     }
 
     updateCoinsDisplay() {
-        document.getElementById('coins-collected').textContent = this.coinsCollected;
+        const coinsEl = document.getElementById('coins-collected');
+        if (coinsEl) {
+            coinsEl.textContent = this.coinsCollected;
+        }
         
         // Unlock chest if enough coins
         if (this.coinsCollected >= 5) {
-            document.querySelector('.mystery-chest').classList.add('unlocked');
+            const chest = document.querySelector('.mystery-chest');
+            if (chest) chest.classList.add('unlocked');
         }
     }
 
     showCoinCollected() {
         const counter = document.querySelector('.coins-counter');
+        if (!counter) return;
+        
         counter.style.animation = 'none';
         setTimeout(() => {
             counter.style.animation = 'slideIn 0.4s ease-out';
@@ -269,6 +327,8 @@ class MiniGameApp {
         
         // Animate chest opening
         const chestElement = document.querySelector('.mystery-chest');
+        if (!chestElement) return;
+        
         chestElement.style.animation = 'none';
         
         setTimeout(() => {
@@ -285,7 +345,7 @@ class MiniGameApp {
 
     showEasterEgg() {
         const popup = document.getElementById('easter-egg-popup');
-        popup.style.display = 'flex';
+        if (popup) popup.style.display = 'flex';
     }
 
     // ========================================================================
@@ -297,13 +357,15 @@ class MiniGameApp {
         this.coinsCollected = 0;
         this.questionsAnswered = 0;
         this.campObjectsViewed.clear();
-        moonTapCount = 0;
+        if (typeof moonTapCount !== 'undefined') {
+            moonTapCount = 0;
+        }
         this.showScreen(1);
     }
 
     showFinalClosure() {
-        // Could show a goodbye message or just reset
-        alert(`Thank you for playing! See you soon, ${CONFIG.friendName}. 👋`);
+        const friendName = (typeof CONFIG !== 'undefined') ? CONFIG.friendName : 'friend';
+        alert(`Thank you for playing! See you soon, ${friendName}. 👋`);
         this.resetAndStart();
     }
 }
